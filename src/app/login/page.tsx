@@ -7,16 +7,42 @@ import Link from "next/link";
 
 export default function LoginPage() {
   const router = useRouter();
-  const { login, user } = useAuth();
+  const { login, user, logout } = useAuth();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
 
-  // If already logged in → redirect to project page
   if (user) {
-    router.push("/projects");
-  }
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-slate-100 px-4">
+      <div className="bg-white shadow-md rounded-lg p-6 w-full max-w-sm text-center">
+        <p className="mb-4 text-sm">
+          You are already logged in as{" "}
+          <span className="font-semibold">{user.email}</span>.
+        </p>
+        <div className="flex gap-3 justify-center">
+          <button
+            className="px-4 py-2 bg-blue-600 text-white text-sm rounded hover:bg-blue-700"
+            onClick={() => {
+              window.location.href = "/projects";
+            }}
+          >
+            Go to dashboard
+          </button>
+          <button
+            className="px-4 py-2 border border-slate-300 text-sm rounded hover:bg-slate-100"
+            onClick={() => {
+              logout();
+            }}
+          >
+            Logout
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
