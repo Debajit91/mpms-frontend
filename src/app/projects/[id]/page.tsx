@@ -88,7 +88,7 @@ const [taskForm, setTaskForm] = useState({
     }
   }, [loading, user, router]);
 
-  // load project + sprints
+  // load project + sprints + tasks + summary
   useEffect(() => {
     if (!user || !id) return;
 
@@ -97,9 +97,10 @@ const [taskForm, setTaskForm] = useState({
         setLoadingData(true);
         setError("");
 
-        // project details
-        const projRes = await api.get(`/api/projects/${id}`);
-        setProject(projRes.data);
+        // 🔹 summary এ project info + counts + progress আছে
+      const summaryRes = await api.get(`/api/projects/${id}/summary`);
+      setSummary(summaryRes.data);
+      setProject(summaryRes.data.project);
 
         // sprints
         const sprintRes = await api.get(`/api/projects/${id}/sprints`);
