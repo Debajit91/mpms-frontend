@@ -1,11 +1,9 @@
 "use client"
-import { useEffect } from "react";
+
 
 export default function HomePage() {
 
-  useEffect(() => {
-  console.log(process.env.NEXT_PUBLIC_API_BASE_URL);
-}, []);
+
 
   return (
     <main className="min-h-screen flex items-center justify-center bg-slate-100">
