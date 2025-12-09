@@ -1,36 +1,125 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Minimal Project Management System (MPMS)
 
-## Getting Started
+A minimal, production-minded Project Management System built as a recruitment assignment.  
+The app provides a simple Admin Dashboard and User Panel to manage projects, sprints, and tasks, with basic reporting and progress tracking.
 
-First, run the development server:
+---
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## Features
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### Authentication & Roles
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- JWT-based authentication (login, register, current user)
+- Role-based access:
+  - Admin
+  - Manager
+  - Member
+- Public registration creates `Member` users
+- Admin/Manager-only actions protected on both backend and frontend
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### Admin / Manager Features
 
-## Learn More
+- Login to admin dashboard
+- Project management:
+  - View all projects in a grid/list
+  - Create new project (title, client, status, dates)
+  - Project detail view
+- Sprint management:
+  - View sprints per project
+  - Create new sprint (title, sprint number auto, start/end dates)
+- Task management:
+  - View all tasks for a project
+  - Create task under a specific sprint
+  - Set status, priority, due date
+  - Inline status updates (To Do / In Progress / Review / Done)
+- Reports (per project):
+  - Total tasks
+  - Completed tasks
+  - Tasks by status (todo / in_progress / review / done)
+  - Sprint count
+  - Time logged (aggregated from tasks)
+  - Progress percentage and visual progress bar
 
-To learn more about Next.js, take a look at the following resources:
+### Member Features
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- Login to user panel
+- View accessible projects
+- View sprints and tasks under a project
+- See own project progress and task status
+- (Depending on role rules) Update task statuses where allowed
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### UI / UX
 
-## Deploy on Vercel
+- Next.js App Router with TypeScript
+- Clean, minimal dashboard-style layout
+- Landing page with hero and navigation to Login / Sign up
+- Responsive layout:
+  - Works on desktop, tablet, and mobile
+- Simple, readable design using Tailwind CSS
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+---
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Tech Stack
+
+### Frontend
+
+- Next.js (App Router, TypeScript)
+- React
+- Tailwind CSS v4
+- Axios (API client)
+
+### Backend
+
+- Node.js
+- Express.js (TypeScript)
+- MongoDB with Mongoose
+- JSON Web Tokens (JWT) for auth
+- Role-based middleware
+
+---
+
+## High-Level Architecture
+
+- Frontend and backend are separate applications.
+- Frontend communicates with backend via REST APIs.
+- Backend manages:
+  - Auth
+  - Users
+  - Projects
+  - Sprints
+  - Tasks
+  - Summary/reporting endpoints
+- Frontend consumes these APIs and renders:
+  - Auth flow
+  - Admin dashboard
+  - Project detail with sprints and tasks
+  - Progress summaries
+
+---
+
+## Live Demo
+
+Replace these with your actual deployed URLs:
+
+- Frontend: `https://mpms-frontend.vercel.app`
+- Backend: `https://mpms-iota.vercel.app`
+
+---
+
+## Test Credentials
+
+Example admin user (seeded via API or DB):
+
+- Role: Admin  
+- Email: `admin@example.com`  
+- Password: `password123`
+
+Example member user (optional):
+
+- Role: Member  
+- Email: `member@example.com`  
+- Password: `password123`
+
+---
+
+
