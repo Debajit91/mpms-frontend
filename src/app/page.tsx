@@ -56,7 +56,7 @@ export default function HomePage() {
 
       {/* Hero section */}
       <section className="flex-1 flex items-center justify-center px-4">
-        <div className="max-w-2xl mx-auto bg-white shadow-sm rounded-lg p-8">
+        <div className="max-w-2xl mx-auto bg-white shadow-sm rounded-lg p-8 text-center">
           <h1 className="text-3xl font-bold mb-3">
             Minimal Project Management System
           </h1>
