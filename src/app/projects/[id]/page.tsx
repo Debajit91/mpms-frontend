@@ -439,7 +439,21 @@ export default function ProjectDetailsPage() {
                     <p className="font-medium mb-1">{t.title}</p>
                     <div className="flex flex-wrap gap-2 text-xs text-slate-500">
                       <div className="flex items-center gap-1">
-                        <span>Status:</span>
+                        <span
+                          className={`inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium
+    ${
+      t.status === "done"
+        ? "bg-green-100 text-green-700"
+        : t.status === "in_progress"
+        ? "bg-blue-100 text-blue-700"
+        : t.status === "review"
+        ? "bg-yellow-100 text-yellow-700"
+        : "bg-slate-100 text-slate-600"
+    }`}
+                        >
+                          {t.status.replace("_", " ")}
+                        </span>
+
                         <select
                           className="border border-slate-300 rounded px-2 py-1 text-xs bg-white"
                           value={t.status}
