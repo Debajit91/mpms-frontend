@@ -62,15 +62,16 @@ export default function ProjectDetailsPage() {
     priority: "medium" as "low" | "medium" | "high",
     dueDate: "",
   });
+  const [updatingTaskId, setUpdatingTaskId] = useState<string | null>(null);
 
-  // 🔒 protect route
+  // protect route
   useEffect(() => {
     if (!loading && !user) {
       router.replace("/login");
     }
   }, [loading, user, router]);
 
-  // 📥 load project + sprints
+  // load project + sprints
   useEffect(() => {
     if (!user || !id) return;
 
@@ -172,6 +173,34 @@ export default function ProjectDetailsPage() {
       setError("Failed to create task");
     } finally {
       setCreatingTask(false);
+    }
+  }
+
+  async function handleTaskStatusChange(
+    taskId: string,
+    status: Task["status"]
+  ) {
+    try {
+      setUpdatingTaskId(taskId);
+
+      await api.patch(`/api/tasks/${taskId}/status`, { status });
+
+      // local state এও update
+      setTasks((prev) =>
+        prev.map((t) =>
+          t._id === taskId
+            ? {
+                ...t,
+                status,
+              }
+            : t
+        )
+      );
+    } catch (err) {
+      console.error("Update task status error:", err);
+      setError("Failed to update task status");
+    } finally {
+      setUpdatingTaskId(null);
     }
   }
 
@@ -355,12 +384,26 @@ export default function ProjectDetailsPage() {
                   <div>
                     <p className="font-medium mb-1">{t.title}</p>
                     <div className="flex flex-wrap gap-2 text-xs text-slate-500">
-                      <span>
-                        Status:{" "}
-                        <span className="font-medium capitalize">
-                          {t.status.replace("_", " ")}
-                        </span>
-                      </span>
+                      <div className="flex items-center gap-1">
+                        <span>Status:</span>
+                        <select
+                          className="border border-slate-300 rounded px-2 py-1 text-xs bg-white"
+                          value={t.status}
+                          disabled={updatingTaskId === t._id}
+                          onChange={(e) =>
+                            handleTaskStatusChange(
+                              t._id,
+                              e.target.value as Task["status"]
+                            )
+                          }
+                        >
+                          <option value="todo">To Do</option>
+                          <option value="in_progress">In Progress</option>
+                          <option value="review">Review</option>
+                          <option value="done">Done</option>
+                        </select>
+                      </div>
+
                       {t.priority && (
                         <span>
                           • Priority:{" "}
@@ -376,6 +419,7 @@ export default function ProjectDetailsPage() {
                       )}
                     </div>
                   </div>
+                  
                 </div>
               ))}
             </div>
