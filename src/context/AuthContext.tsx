@@ -20,28 +20,27 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
 
-  // Load logged-in user from backend (/api/me)
+  
   useEffect(() => {
     async function loadUser(){
         const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
 
     if (!token) {
+      setLoading(false);
       return;
     }
 
-    setLoading(true);
-
-    api
-      .get("/api/me")
-      .then((res) => {
+    try {
+        const res = await api.get("/api/me");
         setUser(res.data.user);
-      })
-      .catch(() => {
+      } catch (err) {
+        console.error("Load /api/me error:", err);
         localStorage.removeItem("token");
-      })
-      .finally(() => setLoading(false));
+      } finally {
+        setLoading(false);
+      }
     }
 
     loadUser();
