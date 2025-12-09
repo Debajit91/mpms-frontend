@@ -162,17 +162,14 @@ export default function ProjectDetailsPage() {
     try {
       await api.delete(`/api/sprints/${sprintId}`);
 
-      
       setSprints((prev) => prev.filter((s) => s._id !== sprintId));
 
-      
       setTasks((prev) =>
         prev.filter((t) => {
-          
           if (typeof t.sprint === "string") {
             return t.sprint !== sprintId;
           }
-          
+
           if (t.sprint && typeof t.sprint === "object" && "_id" in t.sprint) {
             return (t.sprint as Sprint)._id !== sprintId;
           }
@@ -416,6 +413,14 @@ export default function ProjectDetailsPage() {
                   >
                     View tasks
                   </button>
+                  {(user.role === "Admin" || user.role === "Manager") && (
+                    <button
+                      className="text-xs text-red-600 hover:underline"
+                      onClick={() => handleDeleteSprint(s._id)}
+                    >
+                      Delete
+                    </button>
+                  )}
                 </div>
               ))}
             </div>
