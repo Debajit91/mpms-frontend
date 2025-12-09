@@ -247,6 +247,19 @@ export default function ProjectDetailsPage() {
     }
   }
 
+  async function handleDeleteTask(taskId: string) {
+    const sure = window.confirm("Are you sure you want to delete this task?");
+    if (!sure) return;
+
+    try {
+      await api.delete(`/api/tasks/${taskId}`);
+      setTasks((prev) => prev.filter((t) => t._id !== taskId));
+    } catch (err) {
+      console.error("Delete task error:", err);
+      setError("Failed to delete task");
+    }
+  }
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-slate-100">
@@ -522,6 +535,14 @@ export default function ProjectDetailsPage() {
                       )}
                     </div>
                   </div>
+                  {(user.role === "Admin" || user.role === "Manager") && (
+                    <button
+                      className="text-xs text-red-600 hover:underline"
+                      onClick={() => handleDeleteTask(t._id)}
+                    >
+                      Delete
+                    </button>
+                  )}
                 </div>
               ))}
             </div>
