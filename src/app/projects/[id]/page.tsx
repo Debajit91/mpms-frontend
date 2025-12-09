@@ -33,6 +33,19 @@ interface Task {
   sprint?: Sprint | string;
 }
 
+interface ProjectSummary {
+  project: Project;
+  totalTasks: number;
+  completedTasks: number;
+  tasksInProgress: number;
+  tasksInReview: number;
+  tasksTodo: number;
+  sprintCount: number;
+  totalTimeLogged: number;
+  progressPercentage: number;
+}
+
+
 export default function ProjectDetailsPage() {
   const { id } = useParams<{ id: string }>();
   const router = useRouter();
@@ -40,28 +53,32 @@ export default function ProjectDetailsPage() {
 
   const [project, setProject] = useState<Project | null>(null);
   const [sprints, setSprints] = useState<Sprint[]>([]);
+  const [tasks, setTasks] = useState<Task[]>([]);
+  const [summary, setSummary] = useState<ProjectSummary | null>(null);
+
   const [loadingData, setLoadingData] = useState(true);
+  const [loadingTasks, setLoadingTasks] = useState(false);
   const [error, setError] = useState("");
 
   const [isSprintModalOpen, setIsSprintModalOpen] = useState(false);
+  const [isTaskModalOpen, setIsTaskModalOpen] = useState(false);
+
   const [creatingSprint, setCreatingSprint] = useState(false);
+  const [creatingTask, setCreatingTask] = useState(false);
   const [sprintForm, setSprintForm] = useState({
     title: "",
     startDate: "",
     endDate: "",
   });
-
-  const [tasks, setTasks] = useState<Task[]>([]);
-  const [loadingTasks, setLoadingTasks] = useState(false);
-  const [isTaskModalOpen, setIsTaskModalOpen] = useState(false);
-  const [creatingTask, setCreatingTask] = useState(false);
-  const [taskForm, setTaskForm] = useState({
+const [taskForm, setTaskForm] = useState({
     title: "",
     sprintId: "",
     status: "todo" as "todo" | "in_progress" | "review" | "done",
     priority: "medium" as "low" | "medium" | "high",
     dueDate: "",
   });
+  
+  
   const [updatingTaskId, setUpdatingTaskId] = useState<string | null>(null);
 
   // protect route
@@ -419,7 +436,7 @@ export default function ProjectDetailsPage() {
                       )}
                     </div>
                   </div>
-                  
+
                 </div>
               ))}
             </div>
