@@ -18,8 +18,8 @@ export default function LoginPage() {
     <div className="min-h-screen flex items-center justify-center bg-slate-100 px-4">
       <div className="bg-white shadow-md rounded-lg p-6 w-full max-w-sm text-center">
         <p className="mb-4 text-sm">
-          You are already logged in
-          <span className="font-semibold">{user.email}</span>.
+          You are already logged in as {" "}
+          <span className="font-semibold">{user.name}</span>.
         </p>
         <div className="flex gap-3 justify-center">
           <button
