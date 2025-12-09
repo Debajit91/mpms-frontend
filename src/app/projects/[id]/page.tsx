@@ -24,6 +24,15 @@ interface Sprint {
   endDate?: string;
 }
 
+interface Task {
+  _id: string;
+  title: string;
+  status: "todo" | "in_progress" | "review" | "done";
+  priority?: "low" | "medium" | "high";
+  dueDate?: string;
+  sprint?: Sprint | string;
+}
+
 export default function ProjectDetailsPage() {
   const { id } = useParams<{ id: string }>();
   const router = useRouter();
@@ -40,6 +49,18 @@ export default function ProjectDetailsPage() {
     title: "",
     startDate: "",
     endDate: "",
+  });
+
+  const [tasks, setTasks] = useState<Task[]>([]);
+  const [loadingTasks, setLoadingTasks] = useState(false);
+  const [isTaskModalOpen, setIsTaskModalOpen] = useState(false);
+  const [creatingTask, setCreatingTask] = useState(false);
+  const [taskForm, setTaskForm] = useState({
+    title: "",
+    sprintId: "",
+    status: "todo" as "todo" | "in_progress" | "review" | "done",
+    priority: "medium" as "low" | "medium" | "high",
+    dueDate: "",
   });
 
   // 🔒 protect route
@@ -65,11 +86,19 @@ export default function ProjectDetailsPage() {
         // sprints
         const sprintRes = await api.get(`/api/projects/${id}/sprints`);
         setSprints(sprintRes.data);
+
+        // tasks (by project)
+        setLoadingTasks(true);
+        const taskRes = await api.get(`/api/tasks`, {
+          params: { project: id },
+        });
+        setTasks(taskRes.data);
       } catch (err) {
         console.error("Load project details error:", err);
         setError("Failed to load project details");
       } finally {
         setLoadingData(false);
+        setLoadingTasks(false);
       }
     }
 
@@ -109,6 +138,43 @@ export default function ProjectDetailsPage() {
     }
   }
 
+  async function handleCreateTask(e: React.FormEvent) {
+    e.preventDefault();
+    if (!taskForm.title.trim()) return;
+    if (!taskForm.sprintId) return;
+
+    try {
+      setCreatingTask(true);
+      setError("");
+
+      // Task create endpoint: POST /api/sprints/:sprintId/tasks
+      const res = await api.post(`/api/sprints/${taskForm.sprintId}/tasks`, {
+        title: taskForm.title,
+        status: taskForm.status,
+        priority: taskForm.priority,
+        dueDate: taskForm.dueDate || undefined,
+      });
+
+      // নতুন task list এ add
+      setTasks((prev) => [res.data, ...prev]);
+
+      // reset form + close modal
+      setTaskForm({
+        title: "",
+        sprintId: "",
+        status: "todo",
+        priority: "medium",
+        dueDate: "",
+      });
+      setIsTaskModalOpen(false);
+    } catch (err) {
+      console.error("Create task error:", err);
+      setError("Failed to create task");
+    } finally {
+      setCreatingTask(false);
+    }
+  }
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-slate-100">
@@ -137,9 +203,7 @@ export default function ProjectDetailsPage() {
               {project ? project.title : "Project"}
             </h1>
             {project?.client && (
-              <p className="text-xs text-slate-500">
-                Client: {project.client}
-              </p>
+              <p className="text-xs text-slate-500">Client: {project.client}</p>
             )}
           </div>
           <div className="text-xs text-slate-500">
@@ -168,22 +232,17 @@ export default function ProjectDetailsPage() {
                   </span>
                 </p>
                 {project.description && (
-                  <p className="mt-1 text-slate-600">
-                    {project.description}
-                  </p>
+                  <p className="mt-1 text-slate-600">{project.description}</p>
                 )}
               </div>
               <div className="text-right text-xs text-slate-500">
                 {project.startDate && (
                   <p>
-                    Start:{" "}
-                    {new Date(project.startDate).toLocaleDateString()}
+                    Start: {new Date(project.startDate).toLocaleDateString()}
                   </p>
                 )}
                 {project.endDate && (
-                  <p>
-                    End: {new Date(project.endDate).toLocaleDateString()}
-                  </p>
+                  <p>End: {new Date(project.endDate).toLocaleDateString()}</p>
                 )}
               </div>
             </div>
@@ -197,7 +256,7 @@ export default function ProjectDetailsPage() {
               Sprints / Milestones
             </h2>
 
-            {(user.role === "Admin" || user.role === "Manager") ? (
+            {user.role === "Admin" || user.role === "Manager" ? (
               <button
                 onClick={() => setIsSprintModalOpen(true)}
                 className="px-3 py-1 bg-blue-600 text-white rounded text-xs hover:bg-blue-700"
@@ -232,24 +291,91 @@ export default function ProjectDetailsPage() {
                     </p>
                     <p className="text-xs text-slate-500">
                       {s.startDate &&
-                        `Start: ${new Date(
-                          s.startDate
-                        ).toLocaleDateString()} `}
+                        `Start: ${new Date(s.startDate).toLocaleDateString()} `}
                       {s.endDate &&
-                        `• End: ${new Date(
-                          s.endDate
-                        ).toLocaleDateString()}`}
+                        `• End: ${new Date(s.endDate).toLocaleDateString()}`}
                     </p>
                   </div>
-                  
+
                   <button
                     className="text-xs text-blue-600 hover:underline"
-                    onClick={() => {
-                      
-                    }}
+                    onClick={() => {}}
                   >
                     View tasks
                   </button>
+                </div>
+              ))}
+            </div>
+          )}
+        </section>
+
+        {/* Tasks section */}
+        <section>
+          <div className="flex items-center justify-between mb-3">
+            <h2 className="text-sm font-semibold text-slate-800">Tasks</h2>
+
+            {(user.role === "Admin" || user.role === "Manager") &&
+            sprints.length > 0 ? (
+              <button
+                onClick={() => setIsTaskModalOpen(true)}
+                className="px-3 py-1 bg-blue-600 text-white rounded text-xs hover:bg-blue-700"
+              >
+                + Add Task
+              </button>
+            ) : (
+              <button
+                className="px-3 py-1 border border-slate-300 text-xs rounded text-slate-400 cursor-not-allowed"
+                disabled
+                title={
+                  sprints.length === 0
+                    ? "Create a sprint first"
+                    : "Only Admin/Manager can create tasks"
+                }
+              >
+                + Add Task
+              </button>
+            )}
+          </div>
+
+          {loadingTasks && (
+            <p className="text-xs text-slate-500 mb-2">Loading tasks...</p>
+          )}
+
+          {tasks.length === 0 && !loadingTasks ? (
+            <div className="bg-white border border-dashed border-slate-300 rounded-lg p-4 text-xs text-slate-500 text-center">
+              No tasks yet. Admin/Manager can add tasks to sprints.
+            </div>
+          ) : (
+            <div className="space-y-2">
+              {tasks.map((t) => (
+                <div
+                  key={t._id}
+                  className="bg-white rounded-lg border border-slate-200 p-3 flex items-center justify-between text-sm"
+                >
+                  <div>
+                    <p className="font-medium mb-1">{t.title}</p>
+                    <div className="flex flex-wrap gap-2 text-xs text-slate-500">
+                      <span>
+                        Status:{" "}
+                        <span className="font-medium capitalize">
+                          {t.status.replace("_", " ")}
+                        </span>
+                      </span>
+                      {t.priority && (
+                        <span>
+                          • Priority:{" "}
+                          <span className="font-medium capitalize">
+                            {t.priority}
+                          </span>
+                        </span>
+                      )}
+                      {t.dueDate && (
+                        <span>
+                          • Due: {new Date(t.dueDate).toLocaleDateString()}
+                        </span>
+                      )}
+                    </div>
+                  </div>
                 </div>
               ))}
             </div>
@@ -265,9 +391,7 @@ export default function ProjectDetailsPage() {
 
             <form onSubmit={handleCreateSprint} className="space-y-4">
               <div>
-                <label className="block text-sm font-medium mb-1">
-                  Title
-                </label>
+                <label className="block text-sm font-medium mb-1">Title</label>
                 <input
                   className="w-full border border-slate-300 rounded px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none"
                   value={sprintForm.title}
@@ -332,6 +456,132 @@ export default function ProjectDetailsPage() {
                   disabled={creatingSprint}
                 >
                   {creatingSprint ? "Creating..." : "Create Sprint"}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {isTaskModalOpen && (
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg shadow-lg w-full max-w-md p-6">
+            <h2 className="text-lg font-semibold mb-4">Add Task</h2>
+
+            <form onSubmit={handleCreateTask} className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium mb-1">Title</label>
+                <input
+                  className="w-full border border-slate-300 rounded px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none"
+                  value={taskForm.title}
+                  onChange={(e) =>
+                    setTaskForm((prev) => ({
+                      ...prev,
+                      title: e.target.value,
+                    }))
+                  }
+                  placeholder="Task title"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium mb-1">Sprint</label>
+                <select
+                  className="w-full border border-slate-300 rounded px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none"
+                  value={taskForm.sprintId}
+                  onChange={(e) =>
+                    setTaskForm((prev) => ({
+                      ...prev,
+                      sprintId: e.target.value,
+                    }))
+                  }
+                  required
+                >
+                  <option value="">Select sprint</option>
+                  {sprints.map((s) => (
+                    <option key={s._id} value={s._id}>
+                      Sprint {s.sprintNumber}: {s.title}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-sm font-medium mb-1">
+                    Status
+                  </label>
+                  <select
+                    className="w-full border border-slate-300 rounded px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none"
+                    value={taskForm.status}
+                    onChange={(e) =>
+                      setTaskForm((prev) => ({
+                        ...prev,
+                        status: e.target.value as typeof taskForm.status,
+                      }))
+                    }
+                  >
+                    <option value="todo">To Do</option>
+                    <option value="in_progress">In Progress</option>
+                    <option value="review">Review</option>
+                    <option value="done">Done</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium mb-1">
+                    Priority
+                  </label>
+                  <select
+                    className="w-full border border-slate-300 rounded px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none"
+                    value={taskForm.priority}
+                    onChange={(e) =>
+                      setTaskForm((prev) => ({
+                        ...prev,
+                        priority: e.target.value as typeof taskForm.priority,
+                      }))
+                    }
+                  >
+                    <option value="low">Low</option>
+                    <option value="medium">Medium</option>
+                    <option value="high">High</option>
+                  </select>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium mb-1">
+                  Due date
+                </label>
+                <input
+                  type="date"
+                  className="w-full border border-slate-300 rounded px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none"
+                  value={taskForm.dueDate}
+                  onChange={(e) =>
+                    setTaskForm((prev) => ({
+                      ...prev,
+                      dueDate: e.target.value,
+                    }))
+                  }
+                />
+              </div>
+
+              <div className="flex justify-end gap-3 pt-2">
+                <button
+                  type="button"
+                  onClick={() => setIsTaskModalOpen(false)}
+                  className="px-4 py-2 text-sm border border-slate-300 rounded hover:bg-slate-100"
+                  disabled={creatingTask}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-4 py-2 text-sm bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-60"
+                  disabled={creatingTask}
+                >
+                  {creatingTask ? "Creating..." : "Create Task"}
                 </button>
               </div>
             </form>
