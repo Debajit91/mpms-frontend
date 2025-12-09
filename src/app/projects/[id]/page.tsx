@@ -155,6 +155,36 @@ export default function ProjectDetailsPage() {
     }
   }
 
+  async function handleDeleteSprint(sprintId: string) {
+    const sure = window.confirm("Are you sure you want to delete this sprint?");
+    if (!sure) return;
+
+    try {
+      await api.delete(`/api/sprints/${sprintId}`);
+
+      
+      setSprints((prev) => prev.filter((s) => s._id !== sprintId));
+
+      
+      setTasks((prev) =>
+        prev.filter((t) => {
+          
+          if (typeof t.sprint === "string") {
+            return t.sprint !== sprintId;
+          }
+          
+          if (t.sprint && typeof t.sprint === "object" && "_id" in t.sprint) {
+            return (t.sprint as Sprint)._id !== sprintId;
+          }
+          return true;
+        })
+      );
+    } catch (err) {
+      console.error("Delete sprint error:", err);
+      setError("Failed to delete sprint");
+    }
+  }
+
   async function handleCreateTask(e: React.FormEvent) {
     e.preventDefault();
     if (!taskForm.title.trim()) return;

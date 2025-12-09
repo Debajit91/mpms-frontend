@@ -31,14 +31,14 @@ export default function ProjectsPage() {
     status: "planned" as "planned" | "active" | "completed" | "archived",
   });
 
-  // 🔒 protect route: not logged in → /login
+  // protect route: not logged in → /login
   useEffect(() => {
     if (!loading && !user) {
       router.replace("/login");
     }
   }, [loading, user, router]);
 
-  // 📥 fetch projects from backend
+  // fetch projects from backend
   useEffect(() => {
     if (!user) return;
 
@@ -68,7 +68,7 @@ export default function ProjectsPage() {
     );
   }
 
-  // যদি user না থাকে (router.replace trigger হওয়ার আগের মুহূর্তেও)
+  // যদি user না থাকে 
   if (!user) {
     return null;
   }
