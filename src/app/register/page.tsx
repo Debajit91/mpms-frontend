@@ -37,6 +37,7 @@ export default function RegisterPage() {
       } else {
         router.push("/login");
       }
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
       console.error("Register error:", err);
       const msg =
