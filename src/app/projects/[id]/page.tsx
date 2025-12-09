@@ -45,7 +45,6 @@ interface ProjectSummary {
   progressPercentage: number;
 }
 
-
 export default function ProjectDetailsPage() {
   const { id } = useParams<{ id: string }>();
   const router = useRouter();
@@ -70,15 +69,14 @@ export default function ProjectDetailsPage() {
     startDate: "",
     endDate: "",
   });
-const [taskForm, setTaskForm] = useState({
+  const [taskForm, setTaskForm] = useState({
     title: "",
     sprintId: "",
     status: "todo" as "todo" | "in_progress" | "review" | "done",
     priority: "medium" as "low" | "medium" | "high",
     dueDate: "",
   });
-  
-  
+
   const [updatingTaskId, setUpdatingTaskId] = useState<string | null>(null);
 
   // protect route
@@ -98,9 +96,9 @@ const [taskForm, setTaskForm] = useState({
         setError("");
 
         // 🔹 summary এ project info + counts + progress আছে
-      const summaryRes = await api.get(`/api/projects/${id}/summary`);
-      setSummary(summaryRes.data);
-      setProject(summaryRes.data.project);
+        const summaryRes = await api.get(`/api/projects/${id}/summary`);
+        setSummary(summaryRes.data);
+        setProject(summaryRes.data.project);
 
         // sprints
         const sprintRes = await api.get(`/api/projects/${id}/sprints`);
@@ -266,6 +264,44 @@ const [taskForm, setTaskForm] = useState({
         )}
 
         {error && <p className="text-sm text-red-500">{error}</p>}
+
+        {summary && (
+          <section className="bg-white rounded-lg shadow-sm border border-slate-200 p-4 text-sm mb-4">
+            <div className="flex items-center justify-between mb-3">
+              <div>
+                <p className="text-xs uppercase text-slate-400 tracking-wide">
+                  Project Progress
+                </p>
+                <p className="text-lg font-semibold">
+                  {summary.progressPercentage}% complete
+                </p>
+                <p className="text-xs text-slate-500">
+                  {summary.completedTasks} of {summary.totalTasks} tasks
+                  completed
+                </p>
+              </div>
+              <div className="text-right text-xs text-slate-500">
+                <p>Sprints: {summary.sprintCount}</p>
+                <p>Time logged: {summary.totalTimeLogged}h</p>
+              </div>
+            </div>
+
+            {/* progress bar */}
+            <div className="w-full h-2 bg-slate-200 rounded-full overflow-hidden">
+              <div
+                className="h-full bg-blue-600 transition-all"
+                style={{ width: `${summary.progressPercentage}%` }}
+              />
+            </div>
+
+            <div className="mt-3 flex flex-wrap gap-3 text-xs text-slate-500">
+              <span>To Do: {summary.tasksTodo}</span>
+              <span>In Progress: {summary.tasksInProgress}</span>
+              <span>Review: {summary.tasksInReview}</span>
+              <span>Done: {summary.completedTasks}</span>
+            </div>
+          </section>
+        )}
 
         {/* Project summary box  */}
         {project && (
@@ -437,7 +473,6 @@ const [taskForm, setTaskForm] = useState({
                       )}
                     </div>
                   </div>
-
                 </div>
               ))}
             </div>
