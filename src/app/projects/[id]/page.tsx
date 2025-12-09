@@ -294,6 +294,27 @@ export default function ProjectDetailsPage() {
           <div className="text-xs text-slate-500">
             Logged in as {user.name} ({user.role})
           </div>
+
+          {(user.role === "Admin" || user.role === "Manager") && (
+            <button
+              className="text-xs text-red-600 hover:underline ml-3"
+              onClick={async () => {
+                const sure = window.confirm(
+                  "Delete this project and its data?"
+                );
+                if (!sure || !id) return;
+                try {
+                  await api.delete(`/api/projects/${id}`);
+                  router.push("/projects");
+                } catch (err) {
+                  console.error("Delete project error:", err);
+                  setError("Failed to delete project");
+                }
+              }}
+            >
+              Delete project
+            </button>
+          )}
         </div>
       </header>
 
