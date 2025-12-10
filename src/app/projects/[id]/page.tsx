@@ -260,7 +260,7 @@ export default function ProjectDetailsPage() {
     if (!editingSprintId) return;
 
     try {
-      setCreatingSprint(true); 
+      setCreatingSprint(true);
       setError("");
 
       const res = await api.put(`/api/sprints/${editingSprintId}`, {
@@ -277,7 +277,6 @@ export default function ProjectDetailsPage() {
       setIsSprintEditOpen(false);
       setEditingSprintId(null);
 
-      
       toast.success("Sprint updated");
     } catch (err) {
       console.error("Update sprint error:", err);
@@ -422,23 +421,23 @@ export default function ProjectDetailsPage() {
           <div>
             <button
               onClick={() => router.push("/projects")}
-              className="text-xs text-slate-500 hover:underline mb-1"
+              className="text-xs text-slate-500 hover:underline mb-1 cursor-pointer"
             >
               ← Back to Projects
             </button>
-            <h1 className="text-lg font-semibold flex items-center gap-3">
+            <h1 className="text-lg font-semibold flex items-center gap-3 cursor-pointer">
               {project ? project.title : "Project"}
 
               {(user.role === "Admin" || user.role === "Manager") && (
                 <>
                   <button
-                    className="text-xs text-blue-600 hover:underline"
+                    className="text-xs text-blue-600 hover:underline cursor-pointer"
                     onClick={openProjectEdit}
                   >
                     Edit
                   </button>
                   <button
-                    className="text-xs text-red-600 hover:underline"
+                    className="text-xs text-red-600 hover:underline cursor-pointer"
                     onClick={handleDeleteProject}
                   >
                     Delete
@@ -541,7 +540,7 @@ export default function ProjectDetailsPage() {
             {user.role === "Admin" || user.role === "Manager" ? (
               <button
                 onClick={() => setIsSprintModalOpen(true)}
-                className="px-3 py-1 bg-blue-600 text-white rounded text-xs hover:bg-blue-700"
+                className="px-3 py-1 bg-blue-600 text-white rounded text-xs hover:bg-blue-700 cursor-pointer"
               >
                 + Add Sprint
               </button>
@@ -581,18 +580,27 @@ export default function ProjectDetailsPage() {
 
                   <div className="flex justify-items-end gap-2">
                     <button
-                      className="text-xs text-blue-600 hover:underline"
+                      className="text-xs text-blue-600 hover:underline cursor-pointer"
                       onClick={() => {}}
                     >
                       View tasks
                     </button>
+
                     {(user.role === "Admin" || user.role === "Manager") && (
-                      <button
-                        className="text-xs text-red-600 hover:underline"
-                        onClick={() => handleDeleteSprint(s._id)}
-                      >
-                        Delete
-                      </button>
+                      <>
+                        <button
+                          className="text-xs text-slate-600 hover:underline cursor-pointer"
+                          onClick={() => openSprintEdit(s)}
+                        >
+                          Edit
+                        </button>
+                        <button
+                          className="text-xs text-red-600 hover:underline cursor-pointer"
+                          onClick={() => handleDeleteSprint(s._id)}
+                        >
+                          Delete
+                        </button>
+                      </>
                     )}
                   </div>
                 </div>
@@ -610,7 +618,7 @@ export default function ProjectDetailsPage() {
             sprints.length > 0 ? (
               <button
                 onClick={() => setIsTaskModalOpen(true)}
-                className="px-3 py-1 bg-blue-600 text-white rounded text-xs hover:bg-blue-700"
+                className="px-3 py-1 bg-blue-600 text-white rounded text-xs hover:bg-blue-700 cursor-pointer"
               >
                 + Add Task
               </button>
@@ -698,7 +706,7 @@ export default function ProjectDetailsPage() {
                   </div>
                   {(user.role === "Admin" || user.role === "Manager") && (
                     <button
-                      className="text-xs text-red-600 hover:underline"
+                      className="text-xs text-red-600 hover:underline cursor-pointer"
                       onClick={() => handleDeleteTask(t._id)}
                     >
                       Delete
@@ -773,14 +781,14 @@ export default function ProjectDetailsPage() {
                 <button
                   type="button"
                   onClick={() => setIsSprintModalOpen(false)}
-                  className="px-4 py-2 text-sm border border-slate-300 rounded hover:bg-slate-100"
+                  className="px-4 py-2 text-sm border border-slate-300 rounded hover:bg-slate-100 cursor-pointer"
                   disabled={creatingSprint}
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 text-sm bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-60"
+                  className="px-4 py-2 text-sm bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-60 cursor-pointer"
                   disabled={creatingSprint}
                 >
                   {creatingSprint ? "Creating..." : "Create Sprint"}
@@ -900,14 +908,14 @@ export default function ProjectDetailsPage() {
                 <button
                   type="button"
                   onClick={() => setIsProjectEditOpen(false)}
-                  className="px-4 py-2 text-sm border border-slate-300 rounded hover:bg-slate-100"
+                  className="px-4 py-2 text-sm border border-slate-300 rounded hover:bg-slate-100 cursor-pointer"
                   disabled={savingProject}
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 text-sm bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-60"
+                  className="px-4 py-2 text-sm bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-60 cursor-pointer"
                   disabled={savingProject}
                 >
                   {savingProject ? "Saving..." : "Save Changes"}
@@ -1026,17 +1034,98 @@ export default function ProjectDetailsPage() {
                 <button
                   type="button"
                   onClick={() => setIsTaskModalOpen(false)}
-                  className="px-4 py-2 text-sm border border-slate-300 rounded hover:bg-slate-100"
+                  className="px-4 py-2 text-sm border border-slate-300 rounded hover:bg-slate-100 cursor-pointer"
                   disabled={creatingTask}
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 text-sm bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-60"
+                  className="px-4 py-2 text-sm bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-60 cursor-pointer"
                   disabled={creatingTask}
                 >
                   {creatingTask ? "Creating..." : "Create Task"}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {isSprintEditOpen && (
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg shadow-lg w-full max-w-md p-6">
+            <h2 className="text-lg font-semibold mb-4">Edit Sprint</h2>
+
+            <form onSubmit={handleUpdateSprint} className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium mb-1">Title</label>
+                <input
+                  className="w-full border border-slate-300 rounded px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none"
+                  value={sprintEditForm.title}
+                  onChange={(e) =>
+                    setSprintEditForm((prev) => ({
+                      ...prev,
+                      title: e.target.value,
+                    }))
+                  }
+                  required
+                />
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-sm font-medium mb-1">
+                    Start date
+                  </label>
+                  <input
+                    type="date"
+                    className="w-full border border-slate-300 rounded px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none"
+                    value={sprintEditForm.startDate}
+                    onChange={(e) =>
+                      setSprintEditForm((prev) => ({
+                        ...prev,
+                        startDate: e.target.value,
+                      }))
+                    }
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-1">
+                    End date
+                  </label>
+                  <input
+                    type="date"
+                    className="w-full border border-slate-300 rounded px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none"
+                    value={sprintEditForm.endDate}
+                    onChange={(e) =>
+                      setSprintEditForm((prev) => ({
+                        ...prev,
+                        endDate: e.target.value,
+                      }))
+                    }
+                  />
+                </div>
+              </div>
+
+              <div className="flex justify-end gap-3 pt-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsSprintEditOpen(false);
+                    setEditingSprintId(null);
+                  }}
+                  className="px-4 py-2 text-sm border border-slate-300 rounded hover:bg-slate-100 cursor-pointer"
+                  disabled={creatingSprint}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-4 py-2 text-sm bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-60 cursor-pointer"
+                  disabled={creatingSprint}
+                >
+                  {creatingSprint ? "Saving..." : "Save changes"}
                 </button>
               </div>
             </form>
