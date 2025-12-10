@@ -25,8 +25,6 @@ interface Sprint {
   endDate?: string;
 }
 
-
-
 interface Task {
   _id: string;
   title: string;
@@ -620,50 +618,105 @@ export default function ProjectDetailsPage() {
             </div>
           ) : (
             <div className="space-y-2">
-              {sprints.map((s) => (
-                <div
-                  key={s._id}
-                  className="bg-white rounded-lg border border-slate-200 p-3 flex items-center justify-between text-sm"
-                >
-                  <div>
-                    <p className="font-medium">
-                      Sprint {s.sprintNumber}: {s.title}
-                    </p>
-                    <p className="text-xs text-slate-500">
-                      {s.startDate &&
-                        `Start: ${new Date(s.startDate).toLocaleDateString()} `}
-                      {s.endDate &&
-                        `• End: ${new Date(s.endDate).toLocaleDateString()}`}
-                    </p>
-                  </div>
+              {sprints.map((s) => {
+                // 🔹 এই sprint এর জন্য task list বের করি
+                const sprintTasks = tasks.filter((t) => {
+                  // যদি sprint id string হয়
+                  if (typeof t.sprint === "string") {
+                    return t.sprint === s._id;
+                  }
+                  // যদি populated object হয়
+                  if (
+                    t.sprint &&
+                    typeof t.sprint === "object" &&
+                    "_id" in t.sprint
+                  ) {
+                    return (t.sprint as Sprint)._id === s._id;
+                  }
+                  return false;
+                });
 
-                  <div className="flex justify-items-end gap-2">
-                    <button
-                      className="text-xs text-blue-600 hover:underline cursor-pointer"
-                      onClick={() => {}}
-                    >
-                      View tasks
-                    </button>
+                const total = sprintTasks.length;
+                const doneCount = sprintTasks.filter(
+                  (t) => t.status === "done"
+                ).length;
 
-                    {(user.role === "Admin" || user.role === "Manager") && (
-                      <>
+                return (
+                  <div
+                    key={s._id}
+                    className="bg-white rounded-lg border border-slate-200 p-3 text-sm"
+                  >
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="font-medium">
+                          Sprint {s.sprintNumber}: {s.title}
+                        </p>
+                        <p className="text-xs text-slate-500">
+                          {s.startDate &&
+                            `Start: ${new Date(
+                              s.startDate
+                            ).toLocaleDateString()} `}
+                          {s.endDate &&
+                            `• End: ${new Date(
+                              s.endDate
+                            ).toLocaleDateString()}`}
+                        </p>
+                      </div>
+
+                      <div className="flex items-center gap-2">
                         <button
-                          className="text-xs text-slate-600 hover:underline cursor-pointer"
-                          onClick={() => openSprintEdit(s)}
+                          className="text-xs text-blue-600 hover:underline cursor-pointer"
+                          onClick={() => {
+                            // future: maybe scroll to tasks of this sprint
+                          }}
                         >
-                          Edit
+                          View tasks
                         </button>
-                        <button
-                          className="text-xs text-red-600 hover:underline cursor-pointer"
-                          onClick={() => handleDeleteSprint(s._id)}
-                        >
-                          Delete
-                        </button>
-                      </>
-                    )}
+
+                        {(user.role === "Admin" || user.role === "Manager") && (
+                          <>
+                            <button
+                              className="text-xs text-slate-600 hover:underline cursor-pointer"
+                              onClick={() => openSprintEdit(s)}
+                            >
+                              Edit
+                            </button>
+                            <button
+                              className="text-xs text-red-600 hover:underline cursor-pointer"
+                              onClick={() => handleDeleteSprint(s._id)}
+                            >
+                              Delete
+                            </button>
+                          </>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* 🔹 Sprint progress নিচে দেখাই */}
+                    <div className="mt-2">
+                      <div className="flex items-center justify-between text-[11px] text-slate-500 mb-1">
+                        <span>
+                          {doneCount} of {total} tasks done
+                        </span>
+                        {total > 0 && (
+                          <span>{Math.round((doneCount / total) * 100)}%</span>
+                        )}
+                      </div>
+                      <div className="w-full h-1.5 bg-slate-200 rounded-full overflow-hidden">
+                        <div
+                          className="h-full bg-emerald-500 transition-all"
+                          style={{
+                            width:
+                              total > 0
+                                ? `${(doneCount / total) * 100}%`
+                                : "0%",
+                          }}
+                        />
+                      </div>
+                    </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           )}
         </section>
