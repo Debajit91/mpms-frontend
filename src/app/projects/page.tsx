@@ -25,6 +25,8 @@ export default function ProjectsPage() {
     "all" | "planned" | "active" | "completed" | "archived"
   >("all");
 
+  const [clientFilter, setClientFilter] = useState<string>("all");
+
   const [loadingProjects, setLoadingProjects] = useState(false);
   const [error, setError] = useState("");
 
@@ -113,9 +115,17 @@ export default function ProjectsPage() {
     }
   }
 
-  const filteredProjects = projects.filter((p) =>
-    statusFilter === "all" ? true : p.status === statusFilter
-  );
+  const filteredProjects = projects.filter((p) => {
+    const statusOk = statusFilter === "all" ? true : p.status === statusFilter;
+    const clientOk = clientFilter === "all" ? true : p.client === clientFilter;
+    return statusOk && clientOk;
+  });
+
+  const uniqueClients = Array.from(
+    new Set(projects.map((p) => p.client).filter(Boolean))
+  ) as string[];
+
+  
 
   return (
     <div className="min-h-screen bg-slate-100">
@@ -133,7 +143,14 @@ export default function ProjectsPage() {
               className="border border-slate-300 rounded px-2 py-1 text-xs cursor-pointer"
               value={statusFilter}
               onChange={(e) =>
-                setStatusFilter(e.target.value as typeof statusFilter)
+                setStatusFilter(
+                  e.target.value as
+                    | "all"
+                    | "planned"
+                    | "active"
+                    | "completed"
+                    | "archived"
+                )
               }
             >
               <option value="all">All statuses</option>
@@ -141,6 +158,20 @@ export default function ProjectsPage() {
               <option value="active">Active</option>
               <option value="completed">Completed</option>
               <option value="archived">Archived</option>
+            </select>
+
+            {/* client filter */}
+            <select
+              className="border border-slate-300 rounded px-2 py-1 text-xs cursor-pointer"
+              value={clientFilter}
+              onChange={(e) => setClientFilter(e.target.value)}
+            >
+              <option value="all">All clients</option>
+              {uniqueClients.map((client) => (
+                <option key={client} value={client}>
+                  {client}
+                </option>
+              ))}
             </select>
 
             <Link
