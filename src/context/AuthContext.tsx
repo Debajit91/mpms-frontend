@@ -1,19 +1,20 @@
-"use client"
+"use client";
 
 import api from "@/lib/api";
 import { createContext, useContext, useEffect, useState } from "react";
+import toast from "react-hot-toast";
 
 interface User {
-    name: string;
-    email: string;
-    role: string;
+  name: string;
+  email: string;
+  role: string;
 }
 
 interface AuthContextType {
-    user: User | null;
-    loading: boolean;
-    login: (email: string, password: string) => Promise<boolean>;
-    logout: () => void;
+  user: User | null;
+  loading: boolean;
+  login: (email: string, password: string) => Promise<boolean>;
+  logout: () => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -22,17 +23,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
-  
   useEffect(() => {
-    async function loadUser(){
-        const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
+    async function loadUser() {
+      const token =
+        typeof window !== "undefined" ? localStorage.getItem("token") : null;
 
-    if (!token) {
-      setLoading(false);
-      return;
-    }
+      if (!token) {
+        setLoading(false);
+        return;
+      }
 
-    try {
+      try {
         const res = await api.get("/api/me");
         setUser(res.data.user);
       } catch (err) {
@@ -44,7 +45,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
 
     loadUser();
-    
   }, []);
 
   const login = async (email: string, password: string) => {
@@ -55,9 +55,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       localStorage.setItem("token", token);
       setUser(user);
 
+      toast.success("Logged in successfully");
       return true;
     } catch (err) {
       console.error("Login error:", err);
+      const msg = "Invalid email or password";
+      toast.error(msg);
       return false;
     }
   };
@@ -65,6 +68,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const logout = () => {
     localStorage.removeItem("token");
     setUser(null);
+    toast.success("Logged out");
   };
 
   return (

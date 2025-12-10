@@ -5,6 +5,7 @@ import { useParams, useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import api from "@/lib/api";
 import Link from "next/link";
+import toast from "react-hot-toast";
 
 interface Project {
   _id: string;
@@ -170,9 +171,12 @@ export default function ProjectDetailsPage() {
       setProject(res.data);
 
       setIsProjectEditOpen(false);
+
+      toast.success("Project updated");
     } catch (err) {
       console.error("Update project error:", err);
       setError("Failed to update project");
+      toast.error("Failed to update project");
     } finally {
       setSavingProject(false);
     }
@@ -189,11 +193,12 @@ export default function ProjectDetailsPage() {
 
     try {
       await api.delete(`/api/projects/${id}`);
-      
       router.push("/projects");
+      toast.success("Project deleted");
     } catch (err) {
       console.error("Delete project error:", err);
       setError("Failed to delete project");
+      toast.error("Failed to delete project");
     }
   }
 
@@ -222,9 +227,11 @@ export default function ProjectDetailsPage() {
         endDate: "",
       });
       setIsSprintModalOpen(false);
+      toast.success("Sprint created");
     } catch (err) {
       console.error("Create sprint error:", err);
       setError("Failed to create sprint");
+      toast.error("Failed to create sprint");
     } finally {
       setCreatingSprint(false);
     }
@@ -238,6 +245,8 @@ export default function ProjectDetailsPage() {
       await api.delete(`/api/sprints/${sprintId}`);
 
       setSprints((prev) => prev.filter((s) => s._id !== sprintId));
+
+      toast.success("Sprint deleted");
 
       setTasks((prev) =>
         prev.filter((t) => {
@@ -254,6 +263,7 @@ export default function ProjectDetailsPage() {
     } catch (err) {
       console.error("Delete sprint error:", err);
       setError("Failed to delete sprint");
+      toast.error("Failed to delete task")
     }
   }
 
@@ -286,9 +296,11 @@ export default function ProjectDetailsPage() {
         dueDate: "",
       });
       setIsTaskModalOpen(false);
+      toast.success("Task created");
     } catch (err) {
       console.error("Create task error:", err);
       setError("Failed to create task");
+      toast.error("Failed to create task");
     } finally {
       setCreatingTask(false);
     }
@@ -314,9 +326,11 @@ export default function ProjectDetailsPage() {
             : t
         )
       );
+      toast.success("Task status updated");
     } catch (err) {
       console.error("Update task status error:", err);
       setError("Failed to update task status");
+      toast.error("Failed to update task status");
     } finally {
       setUpdatingTaskId(null);
     }
@@ -329,9 +343,11 @@ export default function ProjectDetailsPage() {
     try {
       await api.delete(`/api/tasks/${taskId}`);
       setTasks((prev) => prev.filter((t) => t._id !== taskId));
+      toast.success("Task deleted");
     } catch (err) {
       console.error("Delete task error:", err);
       setError("Failed to delete task");
+      toast.error("Failed to delete task");
     }
   }
 
@@ -359,8 +375,25 @@ export default function ProjectDetailsPage() {
             >
               ← Back to Projects
             </button>
-            <h1 className="text-lg font-semibold">
+            <h1 className="text-lg font-semibold flex items-center gap-3">
               {project ? project.title : "Project"}
+
+              {(user.role === "Admin" || user.role === "Manager") && (
+                <>
+                  <button
+                    className="text-xs text-blue-600 hover:underline"
+                    onClick={openProjectEdit}
+                  >
+                    Edit
+                  </button>
+                  <button
+                    className="text-xs text-red-600 hover:underline"
+                    onClick={handleDeleteProject}
+                  >
+                    Delete
+                  </button>
+                </>
+              )}
             </h1>
             {project?.client && (
               <p className="text-xs text-slate-500">Client: {project.client}</p>
@@ -368,38 +401,6 @@ export default function ProjectDetailsPage() {
           </div>
           <div className="text-xs text-slate-500">
             Logged in as {user.name} ({user.role})
-          </div>
-
-          <div className="flex justify-items-end">
-            {(user.role === "Admin" || user.role === "Manager") && (
-              <button
-                className="text-xs text-blue-600 hover:underline ml-4"
-                onClick={openProjectEdit}
-              >
-                Edit Project
-              </button>
-            )}
-
-            {(user.role === "Admin" || user.role === "Manager") && (
-              <button
-                className="text-xs text-red-600 hover:underline ml-3"
-                onClick={async () => {
-                  const sure = window.confirm(
-                    "Delete this project and its data?"
-                  );
-                  if (!sure || !id) return;
-                  try {
-                    await api.delete(`/api/projects/${id}`);
-                    router.push("/projects");
-                  } catch (err) {
-                    console.error("Delete project error:", err);
-                    setError("Failed to delete project");
-                  }
-                }}
-              >
-                Delete project
-              </button>
-            )}
           </div>
         </div>
       </header>

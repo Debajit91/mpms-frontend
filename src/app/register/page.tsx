@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import api from "@/lib/api";
 import { useAuth } from "@/context/AuthContext";
 import Link from "next/link";
+import toast from "react-hot-toast";
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -22,7 +23,7 @@ export default function RegisterPage() {
     setSubmitting(true);
 
     try {
-      // Register API call – role সবসময় "Member" রাখলাম
+      // Register API call – role সবসময় "Member"
       await api.post("/api/auth/register", {
         name,
         email,
@@ -30,7 +31,9 @@ export default function RegisterPage() {
         role: "Member",
       });
 
-      // সফল হলে auto-login করাতে পারি:
+      toast.success("Account created");
+
+      // সফল হলে auto-login
       const ok = await login(email, password);
       if (ok) {
         router.push("/projects");
@@ -43,6 +46,7 @@ export default function RegisterPage() {
       const msg =
         err?.response?.data?.message || "Registration failed. Try again.";
       setError(msg);
+      toast.error(msg);
     } finally {
       setSubmitting(false);
     }

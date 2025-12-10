@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import api from "@/lib/api";
 import Link from "next/link";
+import toast from "react-hot-toast";
 
 interface Project {
   _id: string;
@@ -97,9 +98,12 @@ export default function ProjectsPage() {
         status: "planned",
       });
       setIsModalOpen(false);
+
+      toast.success("Project created");
     } catch (err) {
       console.error("Create project error:", err);
       setError("Failed to create project");
+      toast.error("Failed to create project");
     } finally {
       setCreating(false);
     }
