@@ -89,6 +89,14 @@ export default function ProjectDetailsPage() {
     endDate: "",
   });
 
+  const [isSprintEditOpen, setIsSprintEditOpen] = useState(false);
+  const [editingSprintId, setEditingSprintId] = useState<string | null>(null);
+  const [sprintEditForm, setSprintEditForm] = useState({
+    title: "",
+    startDate: "",
+    endDate: "",
+  });
+
   const [updatingTaskId, setUpdatingTaskId] = useState<string | null>(null);
 
   // protect route
@@ -263,7 +271,7 @@ export default function ProjectDetailsPage() {
     } catch (err) {
       console.error("Delete sprint error:", err);
       setError("Failed to delete sprint");
-      toast.error("Failed to delete task")
+      toast.error("Failed to delete task");
     }
   }
 
