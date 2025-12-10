@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import api from "@/lib/api";
@@ -83,6 +83,10 @@ export default function ProjectDetailsPage() {
     dueDate: "",
   });
 
+  const [taskStatusFilter, setTaskStatusFilter] = useState<
+    "all" | "todo" | "in_progress" | "review" | "done"
+  >("all");
+
   const [projectForm, setProjectForm] = useState({
     title: "",
     client: "",
@@ -111,6 +115,13 @@ export default function ProjectDetailsPage() {
     dueDate: "",
   });
 
+  const filteredTasks = tasks.filter((t) => {
+    if (taskStatusFilter === "all") return true;
+    return t.status === taskStatusFilter;
+  });
+
+  const tasksSectionRef = useRef<HTMLDivElement>(null);
+
   // protect route
   useEffect(() => {
     if (!loading && !user) {
@@ -127,7 +138,7 @@ export default function ProjectDetailsPage() {
         setLoadingData(true);
         setError("");
 
-        // 🔹 summary এ project info + counts + progress আছে
+        // summary এ project info + counts + progress আছে
         const summaryRes = await api.get(`/api/projects/${id}/summary`);
         setSummary(summaryRes.data);
         setProject(summaryRes.data.project);
@@ -458,6 +469,13 @@ export default function ProjectDetailsPage() {
     }
   }
 
+  function scrollToTasks() {
+    tasksSectionRef.current?.scrollIntoView({
+      behavior: "smooth",
+      block: "start",
+    });
+  }
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-slate-100">
@@ -666,9 +684,7 @@ export default function ProjectDetailsPage() {
                       <div className="flex items-center gap-2">
                         <button
                           className="text-xs text-blue-600 hover:underline cursor-pointer"
-                          onClick={() => {
-                            // future: maybe scroll to tasks of this sprint
-                          }}
+                          onClick={scrollToTasks}
                         >
                           View tasks
                         </button>
@@ -722,63 +738,84 @@ export default function ProjectDetailsPage() {
         </section>
 
         {/* Tasks section */}
-        <section>
+        <section ref={tasksSectionRef} className="space-y-3">
           <div className="flex items-center justify-between mb-3">
             <h2 className="text-sm font-semibold text-slate-800">Tasks</h2>
-
-            {(user.role === "Admin" || user.role === "Manager") &&
-            sprints.length > 0 ? (
-              <button
-                onClick={() => setIsTaskModalOpen(true)}
-                className="px-3 py-1 bg-blue-600 text-white rounded text-xs hover:bg-blue-700 cursor-pointer"
-              >
-                + Add Task
-              </button>
-            ) : (
-              <button
-                className="px-3 py-1 border border-slate-300 text-xs rounded text-slate-400 cursor-not-allowed"
-                disabled
-                title={
-                  sprints.length === 0
-                    ? "Create a sprint first"
-                    : "Only Admin/Manager can create tasks"
+            <div className="flex items-center gap-2">
+              <select
+                className="border border-slate-300 rounded px-2 py-1 text-xs"
+                value={taskStatusFilter}
+                onChange={(e) =>
+                  setTaskStatusFilter(
+                    e.target.value as
+                      | "all"
+                      | "todo"
+                      | "in_progress"
+                      | "review"
+                      | "done"
+                  )
                 }
               >
-                + Add Task
-              </button>
-            )}
-          </div>
+                <option value="all">All statuses</option>
+                <option value="todo">To Do</option>
+                <option value="in_progress">In Progress</option>
+                <option value="review">Review</option>
+                <option value="done">Done</option>
+              </select>
 
-          {loadingTasks && (
-            <p className="text-xs text-slate-500 mb-2">Loading tasks...</p>
-          )}
-
-          {tasks.length === 0 && !loadingTasks ? (
-            <div className="bg-white border border-dashed border-slate-300 rounded-lg p-4 text-xs text-slate-500 text-center">
-              No tasks yet. Admin/Manager can add tasks to sprints.
-            </div>
-          ) : (
-            <div className="space-y-2">
-              {tasks.map((t) => (
-                <div
-                  key={t._id}
-                  className="bg-white rounded-lg border border-slate-200 p-3 flex items-center justify-between text-sm"
+              {(user.role === "Admin" || user.role === "Manager") &&
+              sprints.length > 0 ? (
+                <button
+                  onClick={() => setIsTaskModalOpen(true)}
+                  className="px-3 py-1 bg-blue-600 text-white rounded text-xs hover:bg-blue-700 cursor-pointer"
                 >
-                  <div>
-                    <p className="font-medium mb-1">{t.title}</p>
+                  + Add Task
+                </button>
+              ) : (
+                <button
+                  className="px-3 py-1 border border-slate-300 text-xs rounded text-slate-400 cursor-not-allowed"
+                  disabled
+                  title={
+                    sprints.length === 0
+                      ? "Create a sprint first"
+                      : "Only Admin/Manager can create tasks"
+                  }
+                >
+                  + Add Task
+                </button>
+              )}
+            </div>
 
-                    {t.description && (
-                      <p className="text-xs text-slate-600 mb-1">
-                        {t.description.length > 120
-                          ? t.description.slice(0, 120) + "..."
-                          : t.description}
-                      </p>
-                    )}
+            {loadingTasks && (
+              <p className="text-xs text-slate-500 mb-2">Loading tasks...</p>
+            )}
 
-                    <div className="flex flex-wrap gap-2 text-xs text-slate-500">
-                      <div className="flex items-center gap-1">
-                        <span
-                          className={`inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium
+            {tasks.length === 0 && !loadingTasks ? (
+              <div className="bg-white border border-dashed border-slate-300 rounded-lg p-4 text-xs text-slate-500 text-center">
+                No tasks yet. Admin/Manager can add tasks to sprints.
+              </div>
+            ) : (
+              <div className="space-y-2">
+                {filteredTasks.map((t) => (
+                  <div
+                    key={t._id}
+                    className="bg-white rounded-lg border border-slate-200 p-3 flex items-center justify-between text-sm"
+                  >
+                    <div>
+                      <p className="font-medium mb-1">{t.title}</p>
+
+                      {t.description && (
+                        <p className="text-xs text-slate-600 mb-1">
+                          {t.description.length > 120
+                            ? t.description.slice(0, 120) + "..."
+                            : t.description}
+                        </p>
+                      )}
+
+                      <div className="flex flex-wrap gap-2 text-xs text-slate-500">
+                        <div className="flex items-center gap-1">
+                          <span
+                            className={`inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium
     ${
       t.status === "done"
         ? "bg-green-100 text-green-700"
@@ -788,63 +825,64 @@ export default function ProjectDetailsPage() {
         ? "bg-yellow-100 text-yellow-700"
         : "bg-slate-100 text-slate-600"
     }`}
-                        >
-                          {t.status.replace("_", " ")}
-                        </span>
-
-                        <select
-                          className="border border-slate-300 rounded px-2 py-1 text-xs bg-white"
-                          value={t.status}
-                          disabled={updatingTaskId === t._id}
-                          onChange={(e) =>
-                            handleTaskStatusChange(
-                              t._id,
-                              e.target.value as Task["status"]
-                            )
-                          }
-                        >
-                          <option value="todo">To Do</option>
-                          <option value="in_progress">In Progress</option>
-                          <option value="review">Review</option>
-                          <option value="done">Done</option>
-                        </select>
-                      </div>
-
-                      {t.priority && (
-                        <span>
-                          • Priority:{" "}
-                          <span className="font-medium capitalize">
-                            {t.priority}
+                          >
+                            {t.status.replace("_", " ")}
                           </span>
-                        </span>
-                      )}
-                      {t.dueDate && (
-                        <span>
-                          • Due: {new Date(t.dueDate).toLocaleDateString()}
-                        </span>
-                      )}
+
+                          <select
+                            className="border border-slate-300 rounded px-2 py-1 text-xs bg-white"
+                            value={t.status}
+                            disabled={updatingTaskId === t._id}
+                            onChange={(e) =>
+                              handleTaskStatusChange(
+                                t._id,
+                                e.target.value as Task["status"]
+                              )
+                            }
+                          >
+                            <option value="todo">To Do</option>
+                            <option value="in_progress">In Progress</option>
+                            <option value="review">Review</option>
+                            <option value="done">Done</option>
+                          </select>
+                        </div>
+
+                        {t.priority && (
+                          <span>
+                            • Priority:{" "}
+                            <span className="font-medium capitalize">
+                              {t.priority}
+                            </span>
+                          </span>
+                        )}
+                        {t.dueDate && (
+                          <span>
+                            • Due: {new Date(t.dueDate).toLocaleDateString()}
+                          </span>
+                        )}
+                      </div>
                     </div>
+                    {(user.role === "Admin" || user.role === "Manager") && (
+                      <div className="flex flex-col items-end gap-1">
+                        <button
+                          className="text-xs text-slate-600 hover:underline cursor-pointer"
+                          onClick={() => openTaskEdit(t)}
+                        >
+                          Edit
+                        </button>
+                        <button
+                          className="text-xs text-red-600 hover:underline cursor-pointer"
+                          onClick={() => handleDeleteTask(t._id)}
+                        >
+                          Delete
+                        </button>
+                      </div>
+                    )}
                   </div>
-                  {(user.role === "Admin" || user.role === "Manager") && (
-                    <div className="flex flex-col items-end gap-1">
-                      <button
-                        className="text-xs text-slate-600 hover:underline cursor-pointer"
-                        onClick={() => openTaskEdit(t)}
-                      >
-                        Edit
-                      </button>
-                      <button
-                        className="text-xs text-red-600 hover:underline cursor-pointer"
-                        onClick={() => handleDeleteTask(t._id)}
-                      >
-                        Delete
-                      </button>
-                    </div>
-                  )}
-                </div>
-              ))}
-            </div>
-          )}
+                ))}
+              </div>
+            )}
+          </div>
         </section>
       </main>
 
