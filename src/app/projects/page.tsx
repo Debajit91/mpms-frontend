@@ -21,6 +21,10 @@ export default function ProjectsPage() {
   const { user, loading } = useAuth();
 
   const [projects, setProjects] = useState<Project[]>([]);
+  const [statusFilter, setStatusFilter] = useState<
+    "all" | "planned" | "active" | "completed" | "archived"
+  >("all");
+
   const [loadingProjects, setLoadingProjects] = useState(false);
   const [error, setError] = useState("");
 
@@ -69,7 +73,7 @@ export default function ProjectsPage() {
     );
   }
 
-  // যদি user না থাকে 
+  // যদি user না থাকে
   if (!user) {
     return null;
   }
@@ -109,6 +113,10 @@ export default function ProjectsPage() {
     }
   }
 
+  const filteredProjects = projects.filter((p) =>
+    statusFilter === "all" ? true : p.status === statusFilter
+  );
+
   return (
     <div className="min-h-screen bg-slate-100">
       {/* Top bar */}
@@ -120,7 +128,21 @@ export default function ProjectsPage() {
               Logged in as {user.name} ({user.role})
             </p>
           </div>
-          <div className="flex gap-2">
+          <div className="flex gap-2 items-center">
+            <select
+              className="border border-slate-300 rounded px-2 py-1 text-xs"
+              value={statusFilter}
+              onChange={(e) =>
+                setStatusFilter(e.target.value as typeof statusFilter)
+              }
+            >
+              <option value="all">All statuses</option>
+              <option value="planned">Planned</option>
+              <option value="active">Active</option>
+              <option value="completed">Completed</option>
+              <option value="archived">Archived</option>
+            </select>
+
             <Link
               href="/"
               className="px-3 py-1 border border-slate-300 rounded text-sm hover:bg-slate-100"
@@ -139,7 +161,6 @@ export default function ProjectsPage() {
               <button
                 className="px-3 py-1 border border-slate-300 text-sm rounded text-slate-400 cursor-not-allowed"
                 disabled
-                title="Only Admin/Manager can create projects"
               >
                 + New Project
               </button>
@@ -163,7 +184,7 @@ export default function ProjectsPage() {
           </div>
         ) : (
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {projects.map((project) => (
+            {filteredProjects.map((project) => (
               <Link
                 key={project._id}
                 href={`/projects/${project._id}`}
