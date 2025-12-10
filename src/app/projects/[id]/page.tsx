@@ -99,6 +99,14 @@ export default function ProjectDetailsPage() {
 
   const [updatingTaskId, setUpdatingTaskId] = useState<string | null>(null);
 
+  const [isTaskEditOpen, setIsTaskEditOpen] = useState(false);
+  const [editingTaskId, setEditingTaskId] = useState<string | null>(null);
+  const [taskEditForm, setTaskEditForm] = useState({
+    title: "",
+    priority: "medium" as "low" | "medium" | "high",
+    dueDate: "",
+  });
+
   // protect route
   useEffect(() => {
     if (!loading && !user) {
@@ -351,6 +359,47 @@ export default function ProjectDetailsPage() {
       console.error("Create task error:", err);
       setError("Failed to create task");
       toast.error("Failed to create task");
+    } finally {
+      setCreatingTask(false);
+    }
+  }
+
+  function openTaskEdit(task: Task) {
+    setEditingTaskId(task._id);
+    setTaskEditForm({
+      title: task.title || "",
+      priority: task.priority || "medium",
+      dueDate: task.dueDate ? task.dueDate.slice(0, 10) : "",
+    });
+    setIsTaskEditOpen(true);
+  }
+
+  async function handleUpdateTask(e: React.FormEvent) {
+    e.preventDefault();
+    if (!editingTaskId) return;
+
+    try {
+      setCreatingTask(true);
+      setError("");
+
+      const res = await api.put(`/api/tasks/${editingTaskId}`, {
+        title: taskEditForm.title,
+        priority: taskEditForm.priority,
+        dueDate: taskEditForm.dueDate || undefined,
+      });
+
+      setTasks((prev) =>
+        prev.map((t) => (t._id === editingTaskId ? res.data : t))
+      );
+
+      setIsTaskEditOpen(false);
+      setEditingTaskId(null);
+
+      toast.success("Task updated");
+    } catch (err) {
+      console.error("Update task error:", err);
+      setError("Failed to update task");
+      toast.error("Failed to update task");
     } finally {
       setCreatingTask(false);
     }
@@ -705,12 +754,20 @@ export default function ProjectDetailsPage() {
                     </div>
                   </div>
                   {(user.role === "Admin" || user.role === "Manager") && (
-                    <button
-                      className="text-xs text-red-600 hover:underline cursor-pointer"
-                      onClick={() => handleDeleteTask(t._id)}
-                    >
-                      Delete
-                    </button>
+                    <div className="flex flex-col items-end gap-1">
+                      <button
+                        className="text-xs text-slate-600 hover:underline cursor-pointer"
+                        onClick={() => openTaskEdit(t)}
+                      >
+                        Edit
+                      </button>
+                      <button
+                        className="text-xs text-red-600 hover:underline cursor-pointer"
+                        onClick={() => handleDeleteTask(t._id)}
+                      >
+                        Delete
+                      </button>
+                    </div>
                   )}
                 </div>
               ))}
@@ -1126,6 +1183,92 @@ export default function ProjectDetailsPage() {
                   disabled={creatingSprint}
                 >
                   {creatingSprint ? "Saving..." : "Save changes"}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {isTaskEditOpen && (
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg shadow-lg w-full max-w-md p-6">
+            <h2 className="text-lg font-semibold mb-4">Edit Task</h2>
+
+            <form onSubmit={handleUpdateTask} className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium mb-1">Title</label>
+                <input
+                  className="w-full border border-slate-300 rounded px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none"
+                  value={taskEditForm.title}
+                  onChange={(e) =>
+                    setTaskEditForm((prev) => ({
+                      ...prev,
+                      title: e.target.value,
+                    }))
+                  }
+                  required
+                />
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-sm font-medium mb-1">
+                    Priority
+                  </label>
+                  <select
+                    className="w-full border border-slate-300 rounded px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none"
+                    value={taskEditForm.priority}
+                    onChange={(e) =>
+                      setTaskEditForm((prev) => ({
+                        ...prev,
+                        priority: e.target
+                          .value as typeof taskEditForm.priority,
+                      }))
+                    }
+                  >
+                    <option value="low">Low</option>
+                    <option value="medium">Medium</option>
+                    <option value="high">High</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium mb-1">
+                    Due date
+                  </label>
+                  <input
+                    type="date"
+                    className="w-full border border-slate-300 rounded px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none"
+                    value={taskEditForm.dueDate}
+                    onChange={(e) =>
+                      setTaskEditForm((prev) => ({
+                        ...prev,
+                        dueDate: e.target.value,
+                      }))
+                    }
+                  />
+                </div>
+              </div>
+
+              <div className="flex justify-end gap-3 pt-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsTaskEditOpen(false);
+                    setEditingTaskId(null);
+                  }}
+                  className="px-4 py-2 text-sm border border-slate-300 rounded hover:bg-slate-100 cursor-pointer"
+                  disabled={creatingTask}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-4 py-2 text-sm bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-60 cursor-pointer"
+                  disabled={creatingTask}
+                >
+                  {creatingTask ? "Saving..." : "Save changes"}
                 </button>
               </div>
             </form>

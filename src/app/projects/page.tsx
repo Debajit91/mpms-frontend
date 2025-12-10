@@ -130,7 +130,7 @@ export default function ProjectsPage() {
           </div>
           <div className="flex gap-2 items-center">
             <select
-              className="border border-slate-300 rounded px-2 py-1 text-xs"
+              className="border border-slate-300 rounded px-2 py-1 text-xs cursor-pointer"
               value={statusFilter}
               onChange={(e) =>
                 setStatusFilter(e.target.value as typeof statusFilter)
@@ -153,7 +153,7 @@ export default function ProjectsPage() {
             {user.role === "Admin" || user.role === "Manager" ? (
               <button
                 onClick={() => setIsModalOpen(true)}
-                className="px-3 py-1 bg-blue-600 text-white rounded text-sm hover:bg-blue-700"
+                className="px-3 py-1 bg-blue-600 text-white rounded text-sm hover:bg-blue-700 cursor-pointer"
               >
                 + New Project
               </button>
