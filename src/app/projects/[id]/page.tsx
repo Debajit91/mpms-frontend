@@ -245,6 +245,49 @@ export default function ProjectDetailsPage() {
     }
   }
 
+  function openSprintEdit(sprint: Sprint) {
+    setEditingSprintId(sprint._id);
+    setSprintEditForm({
+      title: sprint.title || "",
+      startDate: sprint.startDate ? sprint.startDate.slice(0, 10) : "",
+      endDate: sprint.endDate ? sprint.endDate.slice(0, 10) : "",
+    });
+    setIsSprintEditOpen(true);
+  }
+
+  async function handleUpdateSprint(e: React.FormEvent) {
+    e.preventDefault();
+    if (!editingSprintId) return;
+
+    try {
+      setCreatingSprint(true); 
+      setError("");
+
+      const res = await api.put(`/api/sprints/${editingSprintId}`, {
+        title: sprintEditForm.title,
+        startDate: sprintEditForm.startDate || undefined,
+        endDate: sprintEditForm.endDate || undefined,
+      });
+
+      // UI update
+      setSprints((prev) =>
+        prev.map((s) => (s._id === editingSprintId ? res.data : s))
+      );
+
+      setIsSprintEditOpen(false);
+      setEditingSprintId(null);
+
+      
+      toast.success("Sprint updated");
+    } catch (err) {
+      console.error("Update sprint error:", err);
+      setError("Failed to update sprint");
+      toast.error("Failed to update sprint");
+    } finally {
+      setCreatingSprint(false);
+    }
+  }
+
   async function handleDeleteSprint(sprintId: string) {
     const sure = window.confirm("Are you sure you want to delete this sprint?");
     if (!sure) return;
