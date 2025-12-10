@@ -1,4 +1,4 @@
-### Minimal Project Management System (MPMS)
+# Minimal Project Management System (MPMS)
 
 A production-oriented project management application built as a technical assessment.
 Includes an Admin Dashboard and User Panel for managing projects, sprints, tasks, and progress reporting with role-based authentication.
@@ -6,15 +6,15 @@ Includes an Admin Dashboard and User Panel for managing projects, sprints, tasks
 
 ## Features
 
-# Authentication and Roles
+### Authentication and Roles
   - JWT-based login, register, current user
   - Role-based access system: Admin, Manager, Member
   - Public registration creates Member users
   - Protected API routes and restricted UI actions based on role
 
-## Admin / Manager Capabilities
+### Admin / Manager Capabilities
 
-# Project Management
+### Project Management
   - View all projects in a grid/list
   - Create a project with: title, client, description, start date, end date, status
   - Edit project details
@@ -26,14 +26,14 @@ Includes an Admin Dashboard and User Panel for managing projects, sprints, tasks
   – Number of sprints
   – Progress percentage with progress bar
 
-# Sprint Management
+### Sprint Management
   - View all sprints under a project
   - Create a sprint (title, auto-increment sprint number, start/end dates)
   - Edit sprint details
   - Delete sprint
   - Sprint-level progress display showing “X of Y tasks done” with progress bar
 
-# Task Management
+### Task Management
   - View tasks grouped under their respective sprints
   - Create a task with: title, description, priority, status, due date
   - Edit task (title, description, priority, due date)
@@ -42,7 +42,7 @@ Includes an Admin Dashboard and User Panel for managing projects, sprints, tasks
   - Priority and status badges for improved clarity
   - Task description preview inside task cards
 
-# Reporting
+### Reporting
   - Project summary includes:
     – Total tasks
     – Completed tasks
@@ -52,14 +52,14 @@ Includes an Admin Dashboard and User Panel for managing projects, sprints, tasks
   - Sprint-level progress indicators
   - Time logging support (model-ready)
 
-# Member Capabilities
+### Member Capabilities
   - View accessible projects
   - View project sprints and tasks
   - Read task details (description, priority, due date)
   - Update task status where allowed
   - Track project and sprint progress
 
-# User Interface and Experience
+### User Interface and Experience
   - Built with Next.js App Router using TypeScript
   - Clean dashboard layout
   - Tailwind CSS v4 for responsive design
@@ -70,13 +70,13 @@ Includes an Admin Dashboard and User Panel for managing projects, sprints, tasks
 
 ## Tech Stack
 
-# Frontend
+### Frontend
   - Next.js 16 (App Router, TypeScript)
   - React
   - Tailwind CSS v4
   - Axios with interceptors
 
-# Backend
+### Backend
   - Node.js
   - Express.js with TypeScript
   - MongoDB with Mongoose
@@ -91,9 +91,9 @@ MongoDB stores all users, projects, sprints, tasks, and metrics.
 
 ## Live Demo
 
-# Frontend: https://your-frontend-url.vercel.app
+### Frontend: https://your-frontend-url.vercel.app
 
-# Backend API: https://your-backend-url.vercel.app
+### Backend API: https://your-backend-url.vercel.app
 
 
 ## Test Credentials
@@ -128,5 +128,6 @@ Password: password123
 ## Notes
 This project meets the core functional requirements with a scalable architecture.
 Additional features like Kanban view, team management UI, comments, attachments, and extended reporting can be added in the future if needed.
+## 
 
-### End of README
+# End of README
