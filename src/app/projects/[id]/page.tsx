@@ -51,6 +51,8 @@ export default function ProjectDetailsPage() {
   const { user, loading } = useAuth();
 
   const [project, setProject] = useState<Project | null>(null);
+  const [isProjectEditOpen, setIsProjectEditOpen] = useState(false);
+  const [savingProject, setSavingProject] = useState(false);
   const [sprints, setSprints] = useState<Sprint[]>([]);
   const [tasks, setTasks] = useState<Task[]>([]);
   const [summary, setSummary] = useState<ProjectSummary | null>(null);
@@ -75,6 +77,15 @@ export default function ProjectDetailsPage() {
     status: "todo" as "todo" | "in_progress" | "review" | "done",
     priority: "medium" as "low" | "medium" | "high",
     dueDate: "",
+  });
+
+  const [projectForm, setProjectForm] = useState({
+    title: "",
+    client: "",
+    description: "",
+    status: "planned",
+    startDate: "",
+    endDate: "",
   });
 
   const [updatingTaskId, setUpdatingTaskId] = useState<string | null>(null);
