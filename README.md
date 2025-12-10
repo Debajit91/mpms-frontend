@@ -3,6 +3,8 @@
 A production-oriented project management application built as a technical assessment.
 Includes an Admin Dashboard and User Panel for managing projects, sprints, tasks, and progress reporting with role-based authentication.
 
+##
+
 ## Features
 
 Authentication and Roles
