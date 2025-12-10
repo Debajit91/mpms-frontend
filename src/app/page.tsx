@@ -44,7 +44,7 @@ export default function HomePage() {
                 </Link>
                 <button
                   onClick={logout}
-                  className="px-3 py-1 rounded border border-slate-300 hover:bg-slate-100"
+                  className="px-3 py-1 rounded border border-slate-300 hover:bg-slate-100 cursor-pointer"
                 >
                   Logout
                 </button>
@@ -90,7 +90,7 @@ export default function HomePage() {
               </Link>
               <button
                 onClick={logout}
-                className="px-4 py-2 rounded border border-slate-300 text-sm hover:bg-slate-100"
+                className="px-4 py-2 rounded border border-slate-300 text-sm hover:bg-slate-100 cursor-pointer"
               >
                 Logout
               </button>
