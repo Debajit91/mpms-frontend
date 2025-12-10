@@ -25,13 +25,17 @@ interface Sprint {
   endDate?: string;
 }
 
+
+
 interface Task {
   _id: string;
   title: string;
+  description?: string;
   status: "todo" | "in_progress" | "review" | "done";
   priority?: "low" | "medium" | "high";
   dueDate?: string;
   sprint?: Sprint | string;
+  project: string;
 }
 
 interface ProjectSummary {
@@ -74,6 +78,7 @@ export default function ProjectDetailsPage() {
   });
   const [taskForm, setTaskForm] = useState({
     title: "",
+    description: "",
     sprintId: "",
     status: "todo" as "todo" | "in_progress" | "review" | "done",
     priority: "medium" as "low" | "medium" | "high",
@@ -103,6 +108,7 @@ export default function ProjectDetailsPage() {
   const [editingTaskId, setEditingTaskId] = useState<string | null>(null);
   const [taskEditForm, setTaskEditForm] = useState({
     title: "",
+    description: "",
     priority: "medium" as "low" | "medium" | "high",
     dueDate: "",
   });
@@ -337,6 +343,7 @@ export default function ProjectDetailsPage() {
       // Task create endpoint: POST /api/sprints/:sprintId/tasks
       const res = await api.post(`/api/sprints/${taskForm.sprintId}/tasks`, {
         title: taskForm.title,
+        description: taskForm.description,
         status: taskForm.status,
         priority: taskForm.priority,
         dueDate: taskForm.dueDate || undefined,
@@ -348,6 +355,7 @@ export default function ProjectDetailsPage() {
       // reset form + close modal
       setTaskForm({
         title: "",
+        description: "",
         sprintId: "",
         status: "todo",
         priority: "medium",
@@ -368,6 +376,7 @@ export default function ProjectDetailsPage() {
     setEditingTaskId(task._id);
     setTaskEditForm({
       title: task.title || "",
+      description: task.description || "",
       priority: task.priority || "medium",
       dueDate: task.dueDate ? task.dueDate.slice(0, 10) : "",
     });
@@ -384,6 +393,7 @@ export default function ProjectDetailsPage() {
 
       const res = await api.put(`/api/tasks/${editingTaskId}`, {
         title: taskEditForm.title,
+        description: taskEditForm.description || undefined,
         priority: taskEditForm.priority,
         dueDate: taskEditForm.dueDate || undefined,
       });
@@ -703,6 +713,15 @@ export default function ProjectDetailsPage() {
                 >
                   <div>
                     <p className="font-medium mb-1">{t.title}</p>
+
+                    {t.description && (
+                      <p className="text-xs text-slate-600 mb-1">
+                        {t.description.length > 120
+                          ? t.description.slice(0, 120) + "..."
+                          : t.description}
+                      </p>
+                    )}
+
                     <div className="flex flex-wrap gap-2 text-xs text-slate-500">
                       <div className="flex items-center gap-1">
                         <span
@@ -1002,6 +1021,24 @@ export default function ProjectDetailsPage() {
                   }
                   placeholder="Task title"
                   required
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium mb-1">
+                  Description
+                </label>
+                <textarea
+                  className="w-full border border-slate-300 rounded px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none"
+                  rows={3}
+                  placeholder="Optional task description"
+                  value={taskForm.description}
+                  onChange={(e) =>
+                    setTaskForm((prev) => ({
+                      ...prev,
+                      description: e.target.value,
+                    }))
+                  }
                 />
               </div>
 
