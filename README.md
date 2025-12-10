@@ -1,125 +1,146 @@
-# Minimal Project Management System (MPMS)
+Minimal Project Management System (MPMS)
 
-A minimal, production-minded Project Management System built as a recruitment assignment.  
-The app provides a simple Admin Dashboard and User Panel to manage projects, sprints, and tasks, with basic reporting and progress tracking.
+A production-oriented project management application built as a technical assessment.
+Includes an Admin Dashboard and User Panel for managing projects, sprints, tasks, and progress reporting with role-based authentication.
 
----
+Features
 
-## Features
+Authentication and Roles
+• JWT-based login, register, current user
+• Role-based access system: Admin, Manager, Member
+• Public registration creates Member users
+• Protected API routes and restricted UI actions based on role
 
-### Authentication & Roles
+Admin / Manager Capabilities
 
-- JWT-based authentication (login, register, current user)
-- Role-based access:
-  - Admin
-  - Manager
-  - Member
-- Public registration creates `Member` users
-- Admin/Manager-only actions protected on both backend and frontend
+Project Management
+• View all projects in a grid/list
+• Create a project with: title, client, description, start date, end date, status
+• Edit project details
+• Delete projects
+• Project details page includes:
+– Total task count
+– Completed tasks
+– Tasks by status
+– Number of sprints
+– Progress percentage with progress bar
 
-### Admin / Manager Features
+Sprint Management
+• View all sprints under a project
+• Create a sprint (title, auto-increment sprint number, start/end dates)
+• Edit sprint details
+• Delete sprint
+• Sprint-level progress display showing “X of Y tasks done” with progress bar
 
-- Login to admin dashboard
-- Project management:
-  - View all projects in a grid/list
-  - Create new project (title, client, status, dates)
-  - Project detail view
-- Sprint management:
-  - View sprints per project
-  - Create new sprint (title, sprint number auto, start/end dates)
-- Task management:
-  - View all tasks for a project
-  - Create task under a specific sprint
-  - Set status, priority, due date
-  - Inline status updates (To Do / In Progress / Review / Done)
-- Reports (per project):
-  - Total tasks
-  - Completed tasks
-  - Tasks by status (todo / in_progress / review / done)
-  - Sprint count
-  - Time logged (aggregated from tasks)
-  - Progress percentage and visual progress bar
+Task Management
+• View tasks grouped under their respective sprints
+• Create a task with: title, description, priority, status, due date
+• Edit task (title, description, priority, due date)
+• Delete task
+• Inline status update: To Do, In Progress, Review, Done
+• Priority and status badges for improved clarity
+• Task description preview inside task cards
 
-### Member Features
+Reporting
+• Project summary includes:
+– Total tasks
+– Completed tasks
+– Tasks categorized by status
+– Number of sprints
+– Visual progress bar
+• Sprint-level progress indicators
+• Time logging support (model-ready)
 
-- Login to user panel
-- View accessible projects
-- View sprints and tasks under a project
-- See own project progress and task status
-- (Depending on role rules) Update task statuses where allowed
+Member Capabilities
+• View accessible projects
+• View project sprints and tasks
+• Read task details (description, priority, due date)
+• Update task status where allowed
+• Track project and sprint progress
 
-### UI / UX
+User Interface and Experience
+• Built with Next.js App Router using TypeScript
+• Clean dashboard layout
+• Tailwind CSS v4 for responsive design
+• Toast notifications for feedback
+• Fully responsive for desktop, tablet, and mobile
+• Modal-based create and edit forms
+• Clear hierarchy of Project → Sprint → Task
 
-- Next.js App Router with TypeScript
-- Clean, minimal dashboard-style layout
-- Landing page with hero and navigation to Login / Sign up
-- Responsive layout:
-  - Works on desktop, tablet, and mobile
-- Simple, readable design using Tailwind CSS
+Tech Stack
 
----
+Frontend
+• Next.js 14 (App Router, TypeScript)
+• React
+• Tailwind CSS v4
+• Axios with interceptors
 
-## Tech Stack
+Backend
+• Node.js
+• Express.js with TypeScript
+• MongoDB with Mongoose
+• JSON Web Tokens (JWT)
+• Role-based authorization middleware
+• REST API architecture
 
-### Frontend
+Architecture Overview
+Frontend communicates with backend through REST APIs.
+Backend handles authentication, authorization, CRUD operations, and reporting.
+MongoDB stores all users, projects, sprints, tasks, and metrics.
 
-- Next.js (App Router, TypeScript)
-- React
-- Tailwind CSS v4
-- Axios (API client)
+Live Demo
 
-### Backend
+Frontend: https://your-frontend-url.vercel.app
 
-- Node.js
-- Express.js (TypeScript)
-- MongoDB with Mongoose
-- JSON Web Tokens (JWT) for auth
-- Role-based middleware
+Backend API: https://your-backend-url.vercel.app
 
----
+(Replace with actual deployed URLs)
 
-## High-Level Architecture
+Test Credentials
 
-- Frontend and backend are separate applications.
-- Frontend communicates with backend via REST APIs.
-- Backend manages:
-  - Auth
-  - Users
-  - Projects
-  - Sprints
-  - Tasks
-  - Summary/reporting endpoints
-- Frontend consumes these APIs and renders:
-  - Auth flow
-  - Admin dashboard
-  - Project detail with sprints and tasks
-  - Progress summaries
+Admin User
+Email: admin@example.com
 
----
+Password: password123
 
-## Live Demo
+Member User
+Email: member@example.com
 
-Replace these with your actual deployed URLs:
+Password: password123
 
-- Frontend: `https://mpms-frontend.vercel.app`
-- Backend: `https://mpms-iota.vercel.app`
+Local Installation
 
----
+Backend
 
-## Test Credentials
+cd backend
 
-Example admin user (seeded via API or DB):
+npm install
 
-- Role: Admin  
-- Email: `admin@example.com`  
-- Password: `password123`
+npm run dev
 
-Example member user (optional):
+Frontend
 
-- Role: Member  
-- Email: `member@example.com`  
-- Password: `password123`
+cd frontend
 
----
+npm install
 
+npm run dev
 
+Completed Requirements Summary
+• JWT authentication and role-based system
+• Full CRUD for projects
+• Full CRUD for sprints
+• Full CRUD for tasks (including description)
+• Inline task status update
+• Project summary and progress bar
+• Sprint-level progress
+• Responsive UI
+• Toast notifications
+• Project status filter
+• Clean and modular REST API structure
+
+Notes
+This project meets the core functional requirements with a scalable architecture.
+Additional features like Kanban view, team management UI, comments, attachments, and extended reporting can be added in the future if needed.
+
+End of README
