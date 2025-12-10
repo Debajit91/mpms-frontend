@@ -837,6 +837,139 @@ export default function ProjectDetailsPage() {
                   {creatingTask ? "Creating..." : "Create Task"}
                 </button>
               </div>
+              {isProjectEditOpen && (
+                <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+                  <div className="bg-white rounded-lg shadow-lg w-full max-w-md p-6">
+                    <h2 className="text-lg font-semibold mb-4">Edit Project</h2>
+
+                    <form onSubmit={handleUpdateProject} className="space-y-4">
+                      <div>
+                        <label className="block text-sm font-medium mb-1">
+                          Title
+                        </label>
+                        <input
+                          className="w-full border border-slate-300 rounded px-3 py-2 text-sm"
+                          value={projectForm.title}
+                          onChange={(e) =>
+                            setProjectForm((prev) => ({
+                              ...prev,
+                              title: e.target.value,
+                            }))
+                          }
+                          required
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium mb-1">
+                          Client
+                        </label>
+                        <input
+                          className="w-full border border-slate-300 rounded px-3 py-2 text-sm"
+                          value={projectForm.client}
+                          onChange={(e) =>
+                            setProjectForm((prev) => ({
+                              ...prev,
+                              client: e.target.value,
+                            }))
+                          }
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium mb-1">
+                          Description
+                        </label>
+                        <textarea
+                          className="w-full border border-slate-300 rounded px-3 py-2 text-sm"
+                          value={projectForm.description}
+                          onChange={(e) =>
+                            setProjectForm((prev) => ({
+                              ...prev,
+                              description: e.target.value,
+                            }))
+                          }
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium mb-1">
+                          Status
+                        </label>
+                        <select
+                          className="w-full border border-slate-300 rounded px-3 py-2 text-sm"
+                          value={projectForm.status}
+                          onChange={(e) =>
+                            setProjectForm((prev) => ({
+                              ...prev,
+                              status: e.target.value,
+                            }))
+                          }
+                        >
+                          <option value="planned">Planned</option>
+                          <option value="active">Active</option>
+                          <option value="completed">Completed</option>
+                          <option value="archived">Archived</option>
+                        </select>
+                      </div>
+
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div>
+                          <label className="block text-sm font-medium mb-1">
+                            Start Date
+                          </label>
+                          <input
+                            type="date"
+                            className="w-full border border-slate-300 rounded px-3 py-2 text-sm"
+                            value={projectForm.startDate}
+                            onChange={(e) =>
+                              setProjectForm((prev) => ({
+                                ...prev,
+                                startDate: e.target.value,
+                              }))
+                            }
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block text-sm font-medium mb-1">
+                            End Date
+                          </label>
+                          <input
+                            type="date"
+                            className="w-full border border-slate-300 rounded px-3 py-2 text-sm"
+                            value={projectForm.endDate}
+                            onChange={(e) =>
+                              setProjectForm((prev) => ({
+                                ...prev,
+                                endDate: e.target.value,
+                              }))
+                            }
+                          />
+                        </div>
+                      </div>
+
+                      <div className="flex justify-end gap-3 pt-2">
+                        <button
+                          type="button"
+                          onClick={() => setIsProjectEditOpen(false)}
+                          className="px-4 py-2 text-sm border border-slate-300 rounded hover:bg-slate-100"
+                          disabled={savingProject}
+                        >
+                          Cancel
+                        </button>
+                        <button
+                          type="submit"
+                          className="px-4 py-2 text-sm bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-60"
+                          disabled={savingProject}
+                        >
+                          {savingProject ? "Saving..." : "Save Changes"}
+                        </button>
+                      </div>
+                    </form>
+                  </div>
+                </div>
+              )}
             </form>
           </div>
         </div>
