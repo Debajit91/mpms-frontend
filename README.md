@@ -1,9 +1,9 @@
-Minimal Project Management System (MPMS)
+### Minimal Project Management System (MPMS)
 
 A production-oriented project management application built as a technical assessment.
 Includes an Admin Dashboard and User Panel for managing projects, sprints, tasks, and progress reporting with role-based authentication.
 
-Features
+## Features
 
 Authentication and Roles
 • JWT-based login, register, current user
@@ -11,9 +11,9 @@ Authentication and Roles
 • Public registration creates Member users
 • Protected API routes and restricted UI actions based on role
 
-Admin / Manager Capabilities
+## Admin / Manager Capabilities
 
-Project Management
+## Project Management
 • View all projects in a grid/list
 • Create a project with: title, client, description, start date, end date, status
 • Edit project details
