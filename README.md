@@ -91,9 +91,9 @@ MongoDB stores all users, projects, sprints, tasks, and metrics.
 
 ## Live Demo
 
-### Frontend: https://your-frontend-url.vercel.app
+### Frontend: https://mpms-frontend.vercel.app
 
-### Backend API: https://your-backend-url.vercel.app
+### Backend API: https://mpms-iota.vercel.app
 
 
 ## Test Credentials
